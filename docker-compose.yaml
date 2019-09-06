@@ -1,0 +1,50 @@
+---
+version: "3.7"
+services:
+  myapp-frontend:
+    build:
+      context: ./frontend
+    image: sasijakki/myapp-frontend:1.0
+    depends_on:
+      - myapp-backend
+    environment:
+      BACKENDLB: myapp-backend
+    ports:
+      - "9000:80"
+    volumes:
+      - type: volume
+        source: myapp-frontend-logvar
+        target: /var/log
+  myapp-frontend-logs:
+    build:
+      context: ./awslogs
+    image: sasijakki/myapp-frontend-logs:1.0
+    depends_on:
+      - myapp-frontend
+    volumes:
+      - type: volume
+        source: myapp-frontend-logvar
+        target: /mnt/log
+        read_only: true
+  myapp-backend:
+    build:
+      context: ./backend
+    image: sasijakki/myapp-backend:1.0
+    volumes:
+      - type: volume
+        source: myapp-backend-logvar
+        target: /var/log
+  myapp-backend-logs:
+    build:
+      context: ./awslogs
+    image: sasijakki/myapp-backend-logs:1.0
+    depends_on:
+      - myapp-backend
+    volumes:
+      - type: volume
+        source: myapp-backend-logvar
+        target: /mnt/log
+        read_only: true
+volumes:
+  myapp-frontend-logvar:
+  myapp-backend-logvar:
