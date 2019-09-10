@@ -2,13 +2,13 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: myapp-backend
-  namespace: mycart
+  name: {{ .Values.names.msname }}-{{ .Values.names.fename }}
+  namespace: {{ .Values.nsname }}
 spec:
   selector:
     matchLabels:
-      app: myapp
-      tier: backend
+      app: {{ .Values.names.msname }}
+      tier: {{ .Values.names.fename }}
   replicas: 2
   minReadySeconds: 5
   progressDeadlineSeconds: 300
@@ -21,11 +21,11 @@ spec:
     metadata:
       labels:
         app: myapp
-        tier: backend
+        tier: frontend
     spec:
       containers:
-      - name: myappbe
-        image: sasijakki/myapp-backend:2.0
+      - name: myappfe
+        image: sasijakki/mycart-frontend:2.0
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -37,13 +37,5 @@ spec:
             cpu: "0.2"
             memory: "200Mi"
         env:
-          - name: "MY_DB_USER"
-            value: "mysqluser"
-          - name: "MY_DB_PASS"
-            value: "password"
-          - name: "MY_DB_NAME"
-            value: "mydyatadb"
-          - name: "MY_DB_HOST_WRITE"
-            value: "mysql-0.msql"
-          - name: "MY_DB_HOST_READ"
-            value: "mysql-read"
+          - name: BACKENDLB
+            value: backendapi
